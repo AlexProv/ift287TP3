@@ -1,6 +1,6 @@
-package tp3;
+package ligueBaseball;
 
-public class tp3 {
+public class Main {
 
 	public static void main(String[] args) {
 		//potato
