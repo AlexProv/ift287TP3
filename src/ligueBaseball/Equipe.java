@@ -1,60 +1,46 @@
 package ligueBaseball;
 import java.sql.*;
+import java.util.ArrayList;
+import java.util.List;
 
-/**
- * Permet d'effectuer les acc�s � la table livre.
- *<pre>
- *
- * Marc Frappier - 83 427 378
- * Universit� de Sherbrooke
- * version 2.0 - 13 novembre 2004
- * ift287 - exploitation de bases de donn�es
- * 
- * Cette classe g�re tous les acc�s � la table livre.
- *
- *</pre>
- */
-
-public class Livre {
+public class Equipe {
 
 private PreparedStatement stmtExiste;
 private PreparedStatement stmtInsert;
-private PreparedStatement stmtUpdate;
 private PreparedStatement stmtDelete;
+private PreparedStatement stmtSelectAll;
 private Connexion cx;
 
 /**
-  * Creation d'une instance. Des �nonc�s SQL pour chaque requ�te sont pr�compil�s.
+  * Creation d'une instance. Des enonces SQL pour chaque requete sont precompiles.
   */
-public Livre(Connexion cx) throws SQLException {
+public Equipe(Connexion cx) throws SQLException {
 
 this.cx = cx;
 stmtExiste = cx.getConnection().prepareStatement
-    ("select idlivre, titre, auteur, dateAcquisition, idMembre, datePret from livre where idlivre = ?");
+    ("select equipeid, terrainid, equipenom from equipe where equipenom = ?");
 stmtInsert = cx.getConnection().prepareStatement
-    ("insert into livre (idLivre, titre, auteur, dateAcquisition, idMembre, datePret) " +
-      "values (?,?,?,?,null,null)");
-stmtUpdate = cx.getConnection().prepareStatement
-    ("update livre set idMembre = ?, datePret = ? " +
-      "where idLivre = ?");
+    ("insert into equipe (equipeid, terrainid, equipenom) " +
+      "values (?,?,?)");
 stmtDelete = cx.getConnection().prepareStatement
-    ("delete from livre where idlivre = ?");
+    ("delete from equipe where equipenom = ?");
+stmtSelectAll = cx.getConnection().prepareStatement
+	("select equipeid, equipenom from equipe order by equipenom");
 }
 
 /**
-  * Retourner la connexion associ�e.
+  * Retourner la connexion associee.
   */
 public Connexion getConnexion() {
-
 return cx;
 }
 
 /**
-  * Verifie si un livre existe.
+  * Verifie si une equipe existe.
   */
-public boolean existe(int idLivre) throws SQLException {
+public boolean existe(String equipeNom) throws SQLException {
 
-stmtExiste.setInt(1,idLivre);
+stmtExiste.setString(1,equipeNom);
 ResultSet rset = stmtExiste.executeQuery();
 boolean livreExiste = rset.next();
 rset.close();
@@ -62,80 +48,43 @@ return livreExiste;
 }
 
 /**
-  * Lecture d'un livre.
+  * Ajout d'une nouvelle equipe
   */
-public TupleLivre getLivre(int idLivre) throws SQLException {
-
-stmtExiste.setInt(1,idLivre);
-ResultSet rset = stmtExiste.executeQuery();
-if (rset.next())
-    {
-    TupleLivre tupleLivre = new TupleLivre();
-    tupleLivre.idLivre = idLivre;
-    tupleLivre.titre = rset.getString(2);
-    tupleLivre.auteur = rset.getString(3);
-    tupleLivre.dateAcquisition = rset.getDate(4);
-    tupleLivre.idMembre = rset.getInt(5);
-    if (rset.wasNull())
-        tupleLivre.idMembreNull = true;
-    else
-        tupleLivre.idMembreNull = false;
-    tupleLivre.datePret = rset.getDate(6);
-    rset.close();
-    return tupleLivre;
-    }
-else
-    return null;
-}
-
-/**
-  * Ajout d'un nouveau livre dans la base de donnees.
-  */
-public void acquerir(int idLivre, String titre, String auteur, String dateAcquisition)
+public void ajoutEquipe(int equipeId, int terrainId, String equipeNom)
   throws SQLException
 {
-/* Ajout du livre. */
-stmtInsert.setInt(1,idLivre);
-stmtInsert.setString(2,titre);
-stmtInsert.setString(3,auteur);
-stmtInsert.setDate(4,Date.valueOf(dateAcquisition));
-stmtInsert.executeUpdate();
+	stmtInsert.setInt(1,equipeId);
+	stmtInsert.setInt(2,terrainId);
+	stmtInsert.setString(3,equipeNom);
+	stmtInsert.executeUpdate();
 }
 
 /**
-  * Enregistrement de l'emprunteur d'un livre.
+  * Suppression d'une equipe.
   */
-public int preter(int idLivre, int idMembre, String datePret)
-  throws SQLException
-{
-/* Enregistrement du pret. */
-stmtUpdate.setInt(1,idMembre);
-stmtUpdate.setDate(2,Date.valueOf(datePret));
-stmtUpdate.setInt(3,idLivre);
-return stmtUpdate.executeUpdate();
-}
-
-/**
-  * Rendre le livre disponible (non-pr�t�)
-  */
-public int retourner(int idLivre)
-  throws SQLException
-{
-/* Enregistrement du pret. */
-stmtUpdate.setNull(1,Types.INTEGER);
-stmtUpdate.setNull(2,Types.DATE);
-stmtUpdate.setInt(3,idLivre);
-return stmtUpdate.executeUpdate();
-}
-
-/**
-  * Suppression d'un livre.
-  */
-public int vendre(int idLivre)
+public int suppressionEquipe(String equipeNom)
   throws SQLException
 {
 /* Suppression du livre. */
-stmtDelete.setInt(1,idLivre);
+stmtDelete.setString(1,equipeNom);
 return stmtDelete.executeUpdate();
+}
+
+/**
+ * 
+ * @return Liste de TupleEquipe
+ * @throws SQLException
+ */
+public List<TupleEquipe> getEquipes() throws SQLException{
+	List<TupleEquipe> listEquipes = new ArrayList<TupleEquipe>();
+	ResultSet rset = stmtSelectAll.executeQuery();
+    while(rset.next()){
+        TupleEquipe tupleEquipe = new TupleEquipe();
+    	tupleEquipe.equipeid = rset.getInt(1);
+    	tupleEquipe.equipenom = rset.getString(2);
+    	listEquipes.add(tupleEquipe);
+    }
+    rset.close();
+    return listEquipes;
 }
 }

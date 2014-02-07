@@ -1,60 +1,38 @@
 package ligueBaseball;
 import java.sql.*;
+import java.util.List;
 
 /**
- * Gestion des transactions de reli�es � la cr�ation et
- * suppresion de livres dans une biblioth�que.
+ * 
+ * @author Mathieu Lavoie, Alex Provencher et Vincent Gagnon
  *
- *<pre>
- * Marc Frappier - 83 427 378
- * Universit� de Sherbrooke
- * version 2.0 - 13 novembre 2004
- * ift287 - exploitation de bases de donn�es
- *
- * Ce programme permet de g�rer les transaction reli�es � la 
- * cr�ation et suppresion de livres.
- *
- * Pr�-condition
- *   la base de donn�es de la biblioth�que doit exister
- *
- * Post-condition
- *   le programme effectue les maj associ�es � chaque
- *   transaction
- * </pre>
  */
-public class GestionLivre {
+public class GestionEquipe {
 
-private Livre livre;
-private Reservation reservation;
+private Equipe equipe;
 private Connexion cx;
 
 /**
   * Creation d'une instance
   */
-public GestionLivre(Livre livre, Reservation reservation) throws LigueBaseballException
+public GestionEquipe(Equipe equipe) throws LigueBaseballException
 {
-this.cx = livre.getConnexion();
-if (livre.getConnexion() != reservation.getConnexion())
-    throw new LigueBaseballException
-        ("Les instances de livre et de reservation n'utilisent pas la m�me connexion au serveur");
-this.livre = livre;
-this.reservation = reservation;
+this.cx = equipe.getConnexion();
+this.equipe = equipe;
 }
 
 /**
-  * Ajout d'un nouveau livre dans la base de donn�es.
-  * S'il existe deja, une exception est lev�e.
+  * Ajout d'une nouvelle equipe dans la base de donnees.
+  * S'il existe deja, une exception est levee.
   */
-public void acquerir(int idLivre, String titre, String auteur, String dateAcquisition)
+public void ajout(int equipeId, int terrainId, String equipeNom)
   throws SQLException, LigueBaseballException, Exception
 {
 try {
-    /* V�rifie si le livre existe d�ja */
-    if (livre.existe(idLivre))
-        throw new LigueBaseballException("Livre existe deja: " + idLivre);
-
-    /* Ajout du livre dans la table des livres */
-    livre.acquerir(idLivre, titre, auteur, dateAcquisition);
+    if (equipe.existe(equipeNom))
+        throw new LigueBaseballException("Equipe existe deja: " + equipeId);
+    
+    equipe.ajoutEquipe(equipeId, terrainId, equipeNom);
     cx.commit();
     }
 catch (Exception e)
@@ -68,25 +46,19 @@ catch (Exception e)
 /**
   * Vente d'un livre.
   */
-public void vendre(int idLivre)
+public void supprimer(String equipeNom)
   throws SQLException, LigueBaseballException, Exception
 {
 try {
-    TupleLivre tupleLivre = livre.getLivre(idLivre);
-    if (tupleLivre == null)
-        throw new LigueBaseballException("Livre inexistant: " + idLivre);
-    if (!tupleLivre.idMembreNull)
-        throw new LigueBaseballException
-            ("Livre " + idLivre + " prete a " + tupleLivre.idMembre);
-    if (reservation.getReservationLivre(idLivre) !=null)
-        throw new LigueBaseballException
-        ("Livre " + idLivre + " r�serv� ");
+    boolean exister = equipe.existe(equipeNom);
+    if (exister == false)
+        throw new LigueBaseballException("Equipe inexistante: " + equipeNom);
     
     /* Suppression du livre. */
-    int nb = livre.vendre(idLivre);
+    int nb = equipe.suppressionEquipe(equipeNom);
     if (nb == 0)
         throw new LigueBaseballException
-        ("Livre " + idLivre + " inexistant");
+        ("Livre " + equipeNom + " inexistant");
     cx.commit();
     }
 catch (Exception e)
@@ -94,5 +66,16 @@ catch (Exception e)
     cx.rollback();
     throw e;
     }
+}
+
+public void getEquipes(){
+	try {
+		List<TupleEquipe> listEquipes = equipe.getEquipes();
+		for (TupleEquipe tupleEquipe : listEquipes) {
+			System.out.println(tupleEquipe.equipeid + "\t" + tupleEquipe.equipenom);
+		}
+	} catch (SQLException e) {
+		e.printStackTrace();
+	}
 }
 }

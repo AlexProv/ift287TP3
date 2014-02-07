@@ -25,7 +25,7 @@ import java.sql.*;
 
 public class GestionReservation {
 
-private Livre livre;
+private Equipe livre;
 private Membre membre;
 private Reservation reservation;
 private Connexion cx;
@@ -35,7 +35,7 @@ private Connexion cx;
   * La connection de l'instance de livre et de membre doit �tre la m�me que cx,
   * afin d'assurer l'int�grit� des transactions.
   */
-public GestionReservation(Livre livre, Membre membre, Reservation reservation)
+public GestionReservation(Equipe livre, Membre membre, Reservation reservation)
   throws LigueBaseballException
 {
   if (livre.getConnexion() != membre.getConnexion() ||
@@ -55,41 +55,41 @@ public GestionReservation(Livre livre, Membre membre, Reservation reservation)
 public void reserver(int idReservation, int idLivre, int idMembre, String dateReservation)
   throws SQLException, LigueBaseballException, Exception
 {
-try {
-    /* Verifier que le livre est pret� */
-    TupleLivre tupleLivre = livre.getLivre(idLivre);
-    if (tupleLivre == null)
-        throw new LigueBaseballException("Livre inexistant: " + idLivre);
-    if (tupleLivre.idMembreNull)
-        throw new LigueBaseballException
-            ("Livre " + idLivre + " n'est pas prete");
-    if (tupleLivre.idMembre == idMembre)
-        throw new LigueBaseballException
-            ("Livre " + idLivre + " deja prete a ce membre");
-
-    /* V�rifier que le membre existe */
-    TupleMembre tupleMembre = membre.getMembre(idMembre);
-    if (tupleMembre == null)
-        throw new LigueBaseballException("Membre inexistant: " + idMembre);
-
-    /* Verifier si date reservation >= datePret */
-    if (Date.valueOf(dateReservation).before(tupleLivre.datePret))
-        throw new LigueBaseballException
-            ("Date de reservation inferieure � la date de pret");
-
-    /* V�rifier que la r�servation n'existe pas */
-    if (reservation.existe(idReservation))
-        throw new LigueBaseballException("R�servation " + idReservation + " existe deja");
-
-    /* Creation de la reservation */
-    reservation.reserver(idReservation,idLivre,idMembre,dateReservation);
-    cx.commit();
-    }
-catch (Exception e)
-    {
-    cx.rollback();
-    throw e;
-    }
+//try {
+//    /* Verifier que le livre est pret� */
+//    TupleEquipe tupleLivre = livre.getLivre(idLivre);
+//    if (tupleLivre == null)
+//        throw new LigueBaseballException("Livre inexistant: " + idLivre);
+//    if (tupleLivre.idMembreNull)
+//        throw new LigueBaseballException
+//            ("Livre " + idLivre + " n'est pas prete");
+//    if (tupleLivre.idMembre == idMembre)
+//        throw new LigueBaseballException
+//            ("Livre " + idLivre + " deja prete a ce membre");
+//
+//    /* V�rifier que le membre existe */
+//    TupleMembre tupleMembre = membre.getMembre(idMembre);
+//    if (tupleMembre == null)
+//        throw new LigueBaseballException("Membre inexistant: " + idMembre);
+//
+//    /* Verifier si date reservation >= datePret */
+//    if (Date.valueOf(dateReservation).before(tupleLivre.datePret))
+//        throw new LigueBaseballException
+//            ("Date de reservation inferieure � la date de pret");
+//
+//    /* V�rifier que la r�servation n'existe pas */
+//    if (reservation.existe(idReservation))
+//        throw new LigueBaseballException("R�servation " + idReservation + " existe deja");
+//
+//    /* Creation de la reservation */
+//    reservation.reserver(idReservation,idLivre,idMembre,dateReservation);
+//    cx.commit();
+//    }
+//catch (Exception e)
+//    {
+//    cx.rollback();
+//    throw e;
+//    }
 }
 
 /**
@@ -101,56 +101,56 @@ catch (Exception e)
 public void prendreRes(int idReservation, String datePret)
   throws SQLException, LigueBaseballException, Exception
 {
-try {
-    /* V�rifie s'il existe une r�servation pour le livre */
-    TupleReservation tupleReservation = reservation.getReservation(idReservation);
-    if (tupleReservation == null)
-        throw new LigueBaseballException("R�servation inexistante : " + idReservation);
-
-    /* V�rifie que c'est la premi�re r�servation pour le livre */
-    TupleReservation tupleReservationPremiere =
-        reservation.getReservationLivre(tupleReservation.idLivre);
-    if (tupleReservation.idReservation != tupleReservationPremiere.idReservation)
-        throw new LigueBaseballException("La r�servation n'est pas la premi�re de la liste " +
-            "pour ce livre; la premiere est " + tupleReservationPremiere.idReservation);
-
-    /* Verifier si le livre est disponible */
-    TupleLivre tupleLivre = livre.getLivre(tupleReservation.idLivre);
-    if (tupleLivre == null)
-        throw new LigueBaseballException("Livre inexistant: " + tupleReservation.idLivre);
-    if (!tupleLivre.idMembreNull)
-        throw new LigueBaseballException
-            ("Livre " + tupleLivre.idLivre + " deja pr�t� � " + tupleLivre.idMembre);
-
-    /* V�rifie si le membre existe et sa limite de pret */
-    TupleMembre tupleMembre = membre.getMembre(tupleReservation.idMembre);
-    if (tupleMembre == null)
-        throw new LigueBaseballException("Membre inexistant: " + tupleReservation.idMembre);
-    if (tupleMembre.nbPret >= tupleMembre.limitePret)
-        throw new LigueBaseballException
-            ("Limite de pr�t du membre " + tupleReservation.idMembre + " atteinte");
-
-    /* Verifier si datePret >= tupleReservation.dateReservation */
-    if (Date.valueOf(datePret).before(tupleReservation.dateReservation))
-        throw new LigueBaseballException
-            ("Date de pr�t inf�rieure � la date de r�servation");
-
-    /* Enregistrement du pret. */
-    if (livre.preter(tupleReservation.idLivre,tupleReservation.idMembre,datePret) == 0)
-        throw new LigueBaseballException
-            ("Livre supprim� par une autre transaction");
-    if (membre.preter(tupleReservation.idMembre) == 0)
-        throw new LigueBaseballException
-            ("Membre supprim� par une autre transaction");
-    /* Eliminer la r�servation */
-    reservation.annulerRes(idReservation);
-    cx.commit();
-    }
-catch (Exception e)
-    {
-    cx.rollback();
-    throw e;
-    }
+//try {
+//    /* V�rifie s'il existe une r�servation pour le livre */
+//    TupleReservation tupleReservation = reservation.getReservation(idReservation);
+//    if (tupleReservation == null)
+//        throw new LigueBaseballException("R�servation inexistante : " + idReservation);
+//
+//    /* V�rifie que c'est la premi�re r�servation pour le livre */
+//    TupleReservation tupleReservationPremiere =
+//        reservation.getReservationLivre(tupleReservation.idLivre);
+//    if (tupleReservation.idReservation != tupleReservationPremiere.idReservation)
+//        throw new LigueBaseballException("La r�servation n'est pas la premi�re de la liste " +
+//            "pour ce livre; la premiere est " + tupleReservationPremiere.idReservation);
+//
+//    /* Verifier si le livre est disponible */
+//    TupleEquipe tupleLivre = livre.getLivre(tupleReservation.idLivre);
+//    if (tupleLivre == null)
+//        throw new LigueBaseballException("Livre inexistant: " + tupleReservation.idLivre);
+//    if (!tupleLivre.idMembreNull)
+//        throw new LigueBaseballException
+//            ("Livre " + tupleLivre.idLivre + " deja pr�t� � " + tupleLivre.idMembre);
+//
+//    /* V�rifie si le membre existe et sa limite de pret */
+//    TupleMembre tupleMembre = membre.getMembre(tupleReservation.idMembre);
+//    if (tupleMembre == null)
+//        throw new LigueBaseballException("Membre inexistant: " + tupleReservation.idMembre);
+//    if (tupleMembre.nbPret >= tupleMembre.limitePret)
+//        throw new LigueBaseballException
+//            ("Limite de pr�t du membre " + tupleReservation.idMembre + " atteinte");
+//
+//    /* Verifier si datePret >= tupleReservation.dateReservation */
+//    if (Date.valueOf(datePret).before(tupleReservation.dateReservation))
+//        throw new LigueBaseballException
+//            ("Date de pr�t inf�rieure � la date de r�servation");
+//
+//    /* Enregistrement du pret. */
+//    if (livre.preter(tupleReservation.idLivre,tupleReservation.idMembre,datePret) == 0)
+//        throw new LigueBaseballException
+//            ("Livre supprim� par une autre transaction");
+//    if (membre.preter(tupleReservation.idMembre) == 0)
+//        throw new LigueBaseballException
+//            ("Membre supprim� par une autre transaction");
+//    /* Eliminer la r�servation */
+//    reservation.annulerRes(idReservation);
+//    cx.commit();
+//    }
+//catch (Exception e)
+//    {
+//    cx.rollback();
+//    throw e;
+//    }
 }
 
 /**

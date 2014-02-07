@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.sql.SQLException;
+import java.text.ParseException;
 import java.util.StringTokenizer;
 
 public class Main {
@@ -70,19 +71,38 @@ public class Main {
 		return transaction;
 	}
 	
-	static void executerTransaction(StringTokenizer tokenizer){
+	static void executerTransaction(StringTokenizer tokenizer) throws SQLException, LigueBaseballException, Exception{
+		String commande = tokenizer.nextToken();
 		
+		if("aide".startsWith(commande)){
+			afficherAide();
+		}
+		else if("afficherEquipes".startsWith(commande)){
+			gestionLigue.gestionEquipe.getEquipes();
+		}
+		else if("supprimerEquipe".startsWith(commande)){
+			gestionLigue.gestionEquipe.supprimer(readString(tokenizer));
+		}
 	}
 
 	/**
 	 * La methode afficherAide sert a afficher l'aide pour les personnes qui ne seraient pas les options.
 	 */
 	static void afficherAide() {
+		System.out.println();
+		System.out.println("Chaque transaction comporte un nom et une liste d'arguments");
+		System.out.println("separes par des espaces. La liste peut etre vide.");
+		System.out.println(" Les dates sont en format yyyy-mm-dd.");
+		System.out.println("");
+		System.out.println("Les transactions sont:");
+		System.out.println("  aide");
+		System.out.println("  exit");
+		System.out.println("  afficherEquipes");
+		System.out.println("  supprimerEquipe <EquipeNom>");
 	}
 	
 
 	static boolean finTransaction(String transaction) {
-		/* fin de fichier atteinte */
 		if (transaction == null)
 			return true;
 
@@ -98,6 +118,63 @@ public class Main {
 			return true;
 		else
 			return false;
+	}
+	/** lecture d'une chaine de caracteres de la transaction entree à l'ecran */
+	static String readString(StringTokenizer tokenizer) throws LigueBaseballException {
+		if (tokenizer.hasMoreElements())
+			return tokenizer.nextToken();
+		else
+			throw new LigueBaseballException("autre parametre attendu");
+	}
+
+	/**
+	 * lecture d'un int java de la transaction entree à l'ecran
+	 */
+	static int readInt(StringTokenizer tokenizer) throws LigueBaseballException {
+		if (tokenizer.hasMoreElements()) {
+			String token = tokenizer.nextToken();
+			try {
+				return Integer.valueOf(token).intValue();
+			} catch (NumberFormatException e) {
+				throw new LigueBaseballException("Nombre attendu a la place de \""
+						+ token + "\"");
+			}
+		} else
+			throw new LigueBaseballException("autre parametre attendu");
+	}
+
+	/**
+	 * lecture d'un long java de la transaction entree a l'ecran
+	 */
+	static long readLong(StringTokenizer tokenizer) throws LigueBaseballException {
+		if (tokenizer.hasMoreElements()) {
+			String token = tokenizer.nextToken();
+			try {
+				return Long.valueOf(token).longValue();
+			} catch (NumberFormatException e) {
+				throw new LigueBaseballException("Nombre attendu a la place de \""
+						+ token + "\"");
+			}
+		} else
+			throw new LigueBaseballException("autre parametre attendu");
+	}
+
+	/**
+	 * lecture d'une date en format YYYY-MM-DD
+	 */
+	static java.util.Date readDate(StringTokenizer tokenizer)
+			throws LigueBaseballException {
+		if (tokenizer.hasMoreElements()) {
+			String token = tokenizer.nextToken();
+			try {
+				return FormatDate.convertirDate(token);
+			} catch (ParseException e) {
+				throw new LigueBaseballException(
+						"Date en format YYYY-MM-DD attendue a la place  de \""
+								+ token + "\"");
+			}
+		} else
+			throw new LigueBaseballException("autre parametre attendu");
 	}
 
 }
