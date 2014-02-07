@@ -30,7 +30,7 @@ public GestionInterrogation gestionInterrogation;
   *</pre>
   */
 public GestionLigueBaseball(String serveur, String bd, String user, String password)
-  throws BiblioException, SQLException
+  throws LigueBaseballException, SQLException
 {
 // allocation des objets pour le traitement des transactions
 cx = new Connexion(serveur, bd, user, password);

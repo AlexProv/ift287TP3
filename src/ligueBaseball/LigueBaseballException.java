@@ -1,19 +1,15 @@
 package ligueBaseball;
 
 /**
- * L'exception BiblioException est lev�e lorsqu'une transaction est inad�quate.
- * Par exemple -- livre inexistant
+ * L'exception LigueBaseballException est levee lorsqu'une transaction est inadequate.
  */
 
-public final class BiblioException extends Exception
+public final class LigueBaseballException extends Exception
 {
-/**
-	 * 
-	 */
 	private static final long serialVersionUID = 1L;
 
-public BiblioException(String message)
-{
-super(message);
-}
+	public LigueBaseballException(String message)
+	{
+		super(message);
+	}
 }
