@@ -36,55 +36,44 @@ private Connection conn;
  * @user userid sur le serveur SQL
  * @pass mot de passe sur le serveur SQL
  */
-public Connexion(String serveur, String bd, String user, String pass)
+public Connexion(String serveur, String bd, String pass, String user)
   throws SQLException
 {
 Driver d;
 try {
-    if (serveur.equals("local"))
-        {
-        d = (Driver) Class.forName("oracle.jdbc.driver.OracleDriver").newInstance();
-        DriverManager.registerDriver(d);
-        conn = DriverManager.getConnection(
-            "jdbc:oracle:thin:@127.0.0.1:1521:" + bd,
-            user, pass);
-        }
-    if (serveur.equals("sti"))
-        {
-        d = (Driver) Class.forName("oracle.jdbc.driver.OracleDriver").newInstance();
-        DriverManager.registerDriver(d);
-        conn = DriverManager.getConnection(
-            "jdbc:oracle:thin:@io.usherbrooke.ca:1521:" + bd,
-             user, pass);
-        }
-    else if (serveur.equals("postgres"))
-        {
-        d = (Driver) Class.forName("org.postgresql.Driver").newInstance();
-        DriverManager.registerDriver(d);
-        conn = DriverManager.getConnection(
-            "jdbc:postgresql:" + bd,
-            user, pass);
-        }
-    else // access
-        {
-        d = (Driver) Class.forName("org.postgresql.Driver").newInstance();
-        DriverManager.registerDriver(new sun.jdbc.odbc.JdbcOdbcDriver());
-        conn = DriverManager.getConnection(
-            "jdbc:odbc:" + bd,
-            "", "");
-        }
+	if (serveur.equals("local")) {
+		d = (Driver) Class.forName("oracle.jdbc.driver.OracleDriver")
+				.newInstance();
+		DriverManager.registerDriver(d);
+		conn = DriverManager.getConnection(
+				"jdbc:oracle:thin:@127.0.0.1:1521:" + bd, user, pass);
+	}
+	if (serveur.equals("sti")) {
+		d = (Driver) Class.forName("oracle.jdbc.driver.OracleDriver")
+				.newInstance();
+		DriverManager.registerDriver(d);
+		conn = DriverManager.getConnection(
+				"jdbc:oracle:thin:@io.usherbrooke.ca:1521:" + bd, user,
+				pass);
+	} else if (serveur.equals("postgres")) {
+		d = (Driver) Class.forName("org.postgresql.Driver")
+				.newInstance();
+		DriverManager.registerDriver(d);
+		conn = DriverManager.getConnection("jdbc:postgresql:" + bd,
+				user, pass);
+	}
 
     // mettre en mode de commit manuel
     conn.setAutoCommit(false);
     
-    // mettre en mode s�rialisable si possible
-    // (plus haut niveau d'integrit� l'acc�s concurrent aux donn�es)
+    // mettre en mode seialisable si possible
+    // (plus haut niveau d'integrite l'acces concurrent aux donnees)
     DatabaseMetaData dbmd = conn.getMetaData();
     if (dbmd.supportsTransactionIsolationLevel(Connection.TRANSACTION_SERIALIZABLE))
         {
         conn.setTransactionIsolation(Connection.TRANSACTION_SERIALIZABLE);
         System.out.println(
-          "Ouverture de la connexion en mode s�rialisable :\n" +
+          "Ouverture de la connexion en mode serialisable :\n" +
           "Estampille " + System.currentTimeMillis() + " " + conn);
         }
     else
@@ -97,7 +86,7 @@ catch (SQLException e) {throw e;}
 catch (Exception e)
     {
     e.printStackTrace(System.out);
-    throw new SQLException("JDBC Driver non instanci�");
+    throw new SQLException("JDBC Driver non instancie");
     }
 }
 
@@ -109,7 +98,7 @@ public void fermer()
 {
 conn.rollback();
 conn.close();
-System.out.println("Connexion ferm�e" + " " + conn);
+System.out.println("Connexion fermee" + " " + conn);
 }
 
 /**
@@ -143,9 +132,8 @@ return conn;
   */
 public static String serveursSupportes()
 {
-return "local : Oracle install� localement 127.0.0.1\n" +
-       "sti   : Oracle install� au Service des technologies de l'information\n" +
-       "postgres : Postgres install� localement\n" +
-       "access : Microsoft Access, install� localement et inscrit dans ODBC";
+return "local : Oracle installe localement 127.0.0.1\n" +
+       "sti   : Oracle installe au Service des technologies de l'information\n" +
+       "postgres : Postgres installe localement\n";
 }
 }// Classe Connexion

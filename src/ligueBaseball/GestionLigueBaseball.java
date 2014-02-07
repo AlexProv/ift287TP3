@@ -2,28 +2,11 @@ package ligueBaseball;
 import java.sql.*;
 
 /**
- * Syst�me de gestion d'une biblioth�que
+ * La classe GestionLigueBaseball
+ * @author Mathieu Lavoie, Alex Provencher et Vincent Gagnon
  *
- *<pre>
- * Marc Frappier - 83 427 378
- * Universit� de Sherbrooke
- * version 2.0 - 13 novembre 2004
- * ift287 - exploitation de bases de donn�es
- *
- * Ce programme permet de g�rer les transaction de base d'une
- * biblioth�que.  Il g�re des livres, des membres et des
- * r�servations. Les donn�es sont conserv�es dans une base de
- * donn�es relationnelles acc�d�e avec JDBC.
- *
- * Pr�-condition
- *   la base de donn�es de la biblioth�que doit exister
- *
- * Post-condition
- *   le programme effectue les maj associ�es � chaque
- *   transaction
- * </pre>
  */
-public class GestionBibliotheque
+public class GestionLigueBaseball
 {
 public Connexion cx;
 public Livre livre;
@@ -46,7 +29,7 @@ public GestionInterrogation gestionInterrogation;
   * @param password mot de passe pour le user id
   *</pre>
   */
-public GestionBibliotheque(String serveur, String bd, String user, String password)
+public GestionLigueBaseball(String serveur, String bd, String user, String password)
   throws BiblioException, SQLException
 {
 // allocation des objets pour le traitement des transactions

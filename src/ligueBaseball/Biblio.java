@@ -38,7 +38,7 @@ import java.text.*;
  */
 public class Biblio
 {
-private static GestionBibliotheque gestionBiblio;
+private static GestionLigueBaseball gestionBiblio;
 private static boolean lectureAuClavier;
 /**
  * Ouverture de la BD,
@@ -70,7 +70,7 @@ try {
         new BufferedReader(
             new InputStreamReader(sourceTransaction));
 
-    gestionBiblio = new GestionBibliotheque("postgres", argv[2], argv[0], argv[1]);
+    gestionBiblio = new GestionLigueBaseball("postgres", argv[2], argv[0], argv[1]);
     traiterTransactions(reader);
     }
 catch (Exception e)
