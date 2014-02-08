@@ -83,6 +83,9 @@ public class Main {
 		else if("supprimerEquipe".startsWith(commande)){
 			gestionLigue.gestionEquipe.supprimer(readString(tokenizer));
 		}
+		else if("creerEquipe".startsWith(commande)){
+			gestionLigue.gestionEquipe.ajout(readString(tokenizer), readString(tokenizer), readString(tokenizer));
+		}
 	}
 
 	/**
@@ -97,6 +100,7 @@ public class Main {
 		System.out.println("Les transactions sont:");
 		System.out.println("  aide");
 		System.out.println("  exit");
+		System.out.println("  creerEquipe <EquipeNom> [<NomTterrain> AdresseTerrain]");
 		System.out.println("  afficherEquipes");
 		System.out.println("  supprimerEquipe <EquipeNom>");
 	}

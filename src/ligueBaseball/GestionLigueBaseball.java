@@ -12,6 +12,7 @@ public Connexion cx;
 public Equipe equipe;
 public Membre membre;
 public Reservation reservation;
+public Terrain terrain;
 public GestionEquipe gestionEquipe;
 public GestionMembre gestionMembre;
 public GestionPret gestionPret;
@@ -35,7 +36,8 @@ public GestionLigueBaseball(String serveur, String bd, String user, String passw
 // allocation des objets pour le traitement des transactions
 cx = new Connexion(serveur, bd, user, password);
 equipe = new Equipe(cx);
-gestionEquipe = new GestionEquipe(equipe);
+terrain = new Terrain(cx);
+gestionEquipe = new GestionEquipe(equipe, terrain);
 }
 
 public void fermer()

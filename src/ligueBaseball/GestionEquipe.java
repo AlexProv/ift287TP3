@@ -10,28 +10,35 @@ import java.util.List;
 public class GestionEquipe {
 
 private Equipe equipe;
+private Terrain terrain;
 private Connexion cx;
 
 /**
   * Creation d'une instance
   */
-public GestionEquipe(Equipe equipe) throws LigueBaseballException
+public GestionEquipe(Equipe equipe, Terrain terrain) throws LigueBaseballException
 {
 this.cx = equipe.getConnexion();
 this.equipe = equipe;
+this.terrain = terrain;
 }
 
 /**
   * Ajout d'une nouvelle equipe dans la base de donnees.
   * S'il existe deja, une exception est levee.
   */
-public void ajout(int equipeId, int terrainId, String equipeNom)
+public void ajout(String equipeNom, String nomTerrain, String adresseTerrain)
   throws SQLException, LigueBaseballException, Exception
 {
 try {
     if (equipe.existe(equipeNom))
-        throw new LigueBaseballException("Equipe existe deja: " + equipeId);
-    
+        throw new LigueBaseballException("Equipe existe deja: " + equipeNom);
+    if (!terrain.existe(nomTerrain)){
+    	int terrainId = terrain.maxTerrain();
+    	terrain.ajoutTerrain(terrainId, nomTerrain, adresseTerrain);
+    }
+    int equipeId = equipe.maxJoueur();
+    int terrainId = terrain.getTerrain(nomTerrain);
     equipe.ajoutEquipe(equipeId, terrainId, equipeNom);
     cx.commit();
     }
@@ -53,12 +60,13 @@ try {
     boolean exister = equipe.existe(equipeNom);
     if (exister == false)
         throw new LigueBaseballException("Equipe inexistante: " + equipeNom);
-    
-    /* Suppression du livre. */
-    int nb = equipe.suppressionEquipe(equipeNom);
-    if (nb == 0)
-        throw new LigueBaseballException
-        ("Livre " + equipeNom + " inexistant");
+    boolean jexister = equipe.existeJoueurs(equipeNom);
+    if (jexister == true){
+    	throw new LigueBaseballException("Impossible de supprimer cette equipe "
+    			+ "( " + equipeNom + " ) car il y a des joueurs associes a cette equipe.");
+    }
+    /* Suppression de l'equipe. */
+    equipe.suppressionEquipe(equipeNom);
     cx.commit();
     }
 catch (Exception e)
