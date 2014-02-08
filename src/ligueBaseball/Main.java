@@ -84,7 +84,11 @@ public class Main {
 			gestionLigue.gestionEquipe.supprimer(readString(tokenizer));
 		}
 		else if("creerEquipe".startsWith(commande)){
-			gestionLigue.gestionEquipe.ajout(readString(tokenizer), readString(tokenizer), readString(tokenizer));
+			if(tokenizer.countTokens() == 2){
+				gestionLigue.gestionEquipe.ajout(readString(tokenizer), readString(tokenizer));
+			} else if(tokenizer.countTokens() == 3){
+				gestionLigue.gestionEquipe.ajout(readString(tokenizer), readString(tokenizer), readString(tokenizer));
+			}
 		}
 	}
 

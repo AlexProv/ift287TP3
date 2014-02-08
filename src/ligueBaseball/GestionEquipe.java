@@ -24,6 +24,29 @@ this.terrain = terrain;
 }
 
 /**
+ * Ajout d'une nouvelle equipe dans la base de donnees.
+ * S'il existe deja, une exception est levee.
+ */
+public void ajout(String equipeNom, String nomTerrain)
+ throws SQLException, LigueBaseballException, Exception
+{
+try {
+   if (equipe.existe(equipeNom))
+       throw new LigueBaseballException("Equipe existe deja: " + equipeNom);
+   int equipeId = equipe.maxJoueur();
+   int terrainId = terrain.getTerrain(nomTerrain);
+   equipe.ajoutEquipe(equipeId, terrainId, equipeNom);
+   cx.commit();
+   }
+catch (Exception e)
+   {
+//       System.out.println(e);
+   cx.rollback();
+   throw e;
+   }
+}
+
+/**
   * Ajout d'une nouvelle equipe dans la base de donnees.
   * S'il existe deja, une exception est levee.
   */
