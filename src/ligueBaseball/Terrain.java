@@ -4,6 +4,11 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
+/**
+ * 
+ * @author Mathieu Lavoie, Alex Provencher et Vincent Gagnon
+ *
+ */
 public class Terrain {
 	private PreparedStatement stmtExiste;
 	private PreparedStatement stmtInsert;
