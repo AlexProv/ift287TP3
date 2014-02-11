@@ -90,6 +90,9 @@ public class Main {
 				gestionLigue.gestionEquipe.ajout(readString(tokenizer), readString(tokenizer), readString(tokenizer));
 			}
 		}
+		else if("--".startsWith(commande)){
+			//Ligne de commentaire, ne rien faire et passer a la prochaine ligne
+		}
 	}
 
 	/**
